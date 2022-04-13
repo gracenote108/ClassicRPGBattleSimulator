@@ -1,44 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using BattleSimulator;
+using System.Collections.Generic;
 
-namespace CombatQueue
+namespace BattleSimulator
 {
     public class Battle
     {
-        private Thread cqThread;
+        private CombatQueueManager _combatQueueManager;
         private List<IParticipant> _participants;
         private List<BattleParticipant> _combatants;
 
-        private CombatQueue _combatQueue;
         private List<IParticipant> _battleReadyList;
         private TextBlock _battleReadyDisplay;
         private TextBlock _combatQueueDisplay;
+        private volatile TextBlock _battleComments;
 
         private readonly Grid _grid;
 
         private void StartCQThread()
         {
-            cqThread = new Thread(ProcessCombatQueue);
-            cqThread.Start();
 
-        }
-
-        private void ProcessCombatQueue()
-        {
-            while (true)
-            {
-                
-            }
         }
 
         public Battle(MainWindow window)
@@ -54,7 +35,6 @@ namespace CombatQueue
 
             _combatants = new List<BattleParticipant>();
             _battleReadyList = new List<IParticipant>();
-            _combatQueue = new CombatQueue();
 
             CreateGrid();
             PopulateCharacters();
@@ -87,6 +67,16 @@ namespace CombatQueue
             Grid.SetRow(_combatQueueDisplay, 5);
             _grid.Children.Add(_combatQueueDisplay);
 
+            _battleComments = new TextBlock();
+            Grid.SetColumn(_battleComments, 1);
+            Grid.SetRow(_battleComments, 6);
+            _battleComments.Text = "Battle Comments Here";
+            _grid.Children.Add(_battleComments);
+
+            //This probably needs to be organized better...probably
+            _combatQueueManager = new CombatQueueManager(_battleComments, _combatQueueDisplay);
+            _combatQueueManager.StartQueueWatch();
+
         }
 
         private void PopulateCharacters()
@@ -105,20 +95,23 @@ namespace CombatQueue
 
         private void AddToReadyList(object sender, IParticipant fighter)
         {
-            _battleReadyList.Add(fighter);
-            UpdateReadyList();
+            lock (_battleReadyList)
+            {
+                _battleReadyList.Add(fighter);
+                UpdateReadyList();
+            }
+            
         }
 
-        private void AddCombatQueue(object sender, IParticipant fighter)
+        private async void AddCombatQueue(object sender, IParticipant fighter)
         {
-            _battleReadyList.Remove(fighter);
-            _combatQueue.Enqueue(fighter);
-            _combatQueueDisplay.Text = "";
-            UpdateReadyList();
-            foreach (IParticipant f in _combatQueue)
+            lock (_battleReadyList)
             {
-                _combatQueueDisplay.Text += $"{f.Name} ";
+                _battleReadyList.Remove(fighter);
+                UpdateReadyList();
             }
+            await _combatQueueManager.SafeEnqueue(fighter);
+            await _combatQueueManager.UpdateCombatQueueList();
         }
 
         private void UpdateReadyList()

@@ -5,13 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CombatQueue
+namespace BattleSimulator
 {
     public class CombatQueue: IEnumerator, IEnumerable
     {
         private FighterNode FirstNode = null;
         private FighterNode CurrentNode = null;
+        private volatile int _count = 0;
 
+        public int Count
+        {
+            get { return _count; }
+        }
         public CombatQueue()
         {
             
@@ -27,7 +32,6 @@ namespace CombatQueue
                 currentQ.Add(current.fighter.Name);
                 current = current.next;
             }
-            // Console.WriteLine("\n");
             return currentQ.ToString();
         }
 
@@ -40,6 +44,7 @@ namespace CombatQueue
             if (FirstNode == null)
             {
                 FirstNode = newNode;
+                _count++;
                 return;
             }
             
@@ -47,6 +52,7 @@ namespace CombatQueue
                 current = current.next;
 
             current.next = newNode;
+            _count++;
         }
 
         public IParticipant Dequeue()
@@ -54,6 +60,7 @@ namespace CombatQueue
 
             var current = FirstNode;
             FirstNode = current.next;
+            _count--;
 
             return current.fighter;
 

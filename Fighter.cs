@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CombatQueue
+namespace BattleSimulator
 {
     public class Fighter : IParticipant
     {
@@ -45,10 +45,5 @@ namespace CombatQueue
         {
             return String.Format("{0} performs an limit break.", _name);
         }
-
-        // public override string ToString()
-        // {
-        //     return Name;
-        // }
     }
 }

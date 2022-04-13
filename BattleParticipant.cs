@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace CombatQueue
+namespace BattleSimulator
 {
     public class BattleParticipant
     {
@@ -111,27 +111,31 @@ namespace CombatQueue
 
         public async Task StartCount(object sender, RoutedEventArgs e)
         {
+            _atbBtn.IsEnabled = false;
             for (int i = 0; i <= progBarMax; i+=participant.Speed)
             {
                 await Task.Delay(new TimeSpan(0, 0, 0, 0, 50));
                 _progBar.Value += participant.Speed;
             }
 
-            _atbBtn.IsEnabled = false;
             _atkBtn.IsEnabled = true;
             _limitBreak.IsEnabled = true;
             OnProgressBarFull(participant);
         }
 
-        public void Attack(object sender, RoutedEventArgs e)
+        public async void Attack(object sender, RoutedEventArgs e)
         {
+            await Task.Delay(new TimeSpan(0, 0, 0, 0, 50));
+            _atbBtn.IsEnabled = true;
             _progBar.Value = 0;
             _atkBtn.IsEnabled = false;
             _limitBreak.IsEnabled = false;
             OnAttackExecuted(participant);
         }
-        public void LimitBreak(object sender, RoutedEventArgs e)
+        public async void LimitBreak(object sender, RoutedEventArgs e)
         {
+            await Task.Delay(new TimeSpan(0, 0, 0, 0, 50));
+            _atbBtn.IsEnabled = true;
             _progBar.Value = 0;
             _atkBtn.IsEnabled = false;
             _limitBreak.IsEnabled = false;

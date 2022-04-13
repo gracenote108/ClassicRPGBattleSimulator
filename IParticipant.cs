@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CombatQueue
+namespace BattleSimulator
 {
     public interface IParticipant
     {
@@ -16,5 +16,6 @@ namespace CombatQueue
         string Attack();
 
         string Special();
+
     }
 }

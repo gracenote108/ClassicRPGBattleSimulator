@@ -66,6 +66,7 @@
     <Compile Include="Battle.cs" />
     <Compile Include="BattleParticipant.cs" />
     <Compile Include="CombatQueue.cs" />
+    <Compile Include="CombatQueueManager.cs" />
     <Compile Include="Fighter.cs" />
     <Compile Include="IParticipant.cs" />
     <Compile Include="MainWindow.xaml.cs">
